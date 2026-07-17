@@ -5,21 +5,21 @@ export class CreateServerDto {
 
     @IsString()
     @MinLength(1)
-    server_id: string;
+    server_id!: string;
 
     @IsString()
     @MinLength(1)
-    hostname: string;
+    hostname!: string;
 
     @IsString()
     @MinLength(1)
-    ip_address: string;
+    ip_address!: string;
 
     @IsNumber()
     @Min(1)
-    ssh_port: number;
+    ssh_port!: number;
 
     @IsString()
     @MinLength(1)
-    mine_name: string;
+    mine_name!: string;
 } 
