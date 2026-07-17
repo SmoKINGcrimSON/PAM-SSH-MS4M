@@ -11,14 +11,14 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
-    getAllUsers(@Query('limit') limit?: string) {
-        return this.userService.getAllUsers({limit: limit ? parseInt(limit) : undefined});
+    getAllUsers(@Query('limit') limit?: string){
+        return this.userService.getAllUsers({limit: limit !== undefined ? Number(limit) : undefined});
     }
 
     @Get('/:id')
-    @UseGuards(IdGuard) // Use the IdGuard to validate the id parameter
-    getUser(@Param('id') id: string) {
-        return this.userService.getUser({id});
+    @UseGuards(IdGuard)
+    getUser(@Param('id') id: string){
+        return this.userService.getUser({id: Number(id)});
     }
 
     @Post()
@@ -26,18 +26,15 @@ export class UserController {
         return this.userService.createUser(user);
     }
 
-    @Put() //update all the data of user
-    updateUser(@Body() user: UpdateUserDto) {
-        return this.userService.updateUser(user);
+    @Patch('/:id')
+    @UseGuards(IdGuard)
+    updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
+        return this.userService.updateUser(Number(id), user);
     }
 
-    @Delete()
-    deleteUser() {
-        return this.userService.deleteUser();
-    }
-
-    @Patch() //update only the specific data of user 
-    patchUser() {
-        return this.userService.patchUser();
+    @Delete('/:id')
+    @UseGuards(IdGuard)
+    deleteUser(@Param('id') id: string) {
+        return this.userService.deleteUser({id: Number(id)});
     }
 }
