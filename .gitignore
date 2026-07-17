@@ -56,3 +56,15 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# TypeORM
+*.typeorm
+
+# Local data
+data/
+database/
