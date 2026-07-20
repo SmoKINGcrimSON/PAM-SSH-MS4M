@@ -15,12 +15,8 @@ export class UserService {
         })
     }
 
-    async getUser({id}: {id?: number} = {}): Promise<User[]>{
-        return this.userRepository.find({
-            where: {
-                user_id: id
-            }
-        })
+    async getUser({id}: {id?: number} = {}): Promise<User|null>{
+        return this.userRepository.findOneBy({user_id: id});
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -28,14 +24,14 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User|null> {
         //find the user by id
         const user = await this.userRepository.findOneBy({
             user_id: id
         });
 
         // If the user is not found, throw a NotFoundException
-        if (!user) throw new NotFoundException(`User with id ${id} not found`);
+        if (!user) return null;
 
         // Update the user properties here if needed
         // For example, you can update the username or user_type based on the provided data

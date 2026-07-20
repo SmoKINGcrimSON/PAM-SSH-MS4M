@@ -1,33 +1,37 @@
-import { Controller, Get, Param, Post, Body, Query, HttpCode, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Query, HttpCode, UseGuards, ParseIntPipe, Inject, NotFoundException, Patch } from '@nestjs/common';
 import { IdGuard } from '../guards/id.guard';
 import { ServerService } from './server.service';
 import { CreateServerDto } from './dto/create-server.dto';
+import { UpdateServerDto } from './dto/update-server.dto';
 
 @Controller('server') 
 export class ServerController { 
 
     constructor(private readonly serverService: ServerService){} //private rreadonly
    
-
-   @Get()
-    getAllServers(@Query('limit') limit?: string) {
-    return this.serverService.getAllServers({ limit });
-    }
-
-    @Get('/:not-found')
-    @HttpCode(404)
-    errorPage() {
-        return { message: 'Resource not found' };
+    @Get()
+    async getAllServers(@Query('limit') limit?: string) {
+        return this.serverService.getAllServers({ limit: limit !== undefined ? Number(limit) : undefined });
     }
 
     @Get('/:id')
     @UseGuards(IdGuard)
-    getServerById(@Param('id') id: string) {
-        return this.serverService.getServer(id);
+    async getServer(@Param('id') id: string) {
+        const server = await this.serverService.getServer({id: Number(id)});
+        if (server == null) throw new NotFoundException(`Server with id ${id} not found`);
+        return server;
     }
 
     @Post()
-    createServer(@Body() createServerDto: CreateServerDto) {
-        return this.serverService.createServer(createServerDto);
+    async createServer(@Body() server: CreateServerDto) {
+        return this.serverService.createServer(server);
+    }
+
+    @Patch('/:id')
+    @UseGuards(IdGuard)
+    async updateServer(@Param('id') id: string, @Body() server: UpdateServerDto) {
+        const updatedServer = await this.serverService.updateServer(Number(id), server);
+        if (updatedServer == null) throw new NotFoundException(`Server with id ${id} not found`);
+        return updatedServer;
     }
 }

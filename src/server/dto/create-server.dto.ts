@@ -5,10 +5,6 @@ export class CreateServerDto {
 
     @IsString()
     @MinLength(1)
-    server_id!: string;
-
-    @IsString()
-    @MinLength(1)
     hostname!: string;
 
     @IsString()
