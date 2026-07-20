@@ -18,6 +18,11 @@ export class Server{
     @Column()
     mine_name!: string;
 
+    //new column added
+    @Column()
+    server_password!: string;
+    //
+
     constructor(server: Partial<Server>){
         Object.assign(this, server)
     }

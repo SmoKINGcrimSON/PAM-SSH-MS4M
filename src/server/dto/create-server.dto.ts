@@ -1,4 +1,3 @@
-
 import { IsNumber, IsString, Min, MinLength } from 'class-validator';
 
 export class CreateServerDto {
@@ -18,4 +17,8 @@ export class CreateServerDto {
     @IsString()
     @MinLength(1)
     mine_name!: string;
+
+    @IsString()
+    @MinLength(1)
+    server_password!: string;
 } 

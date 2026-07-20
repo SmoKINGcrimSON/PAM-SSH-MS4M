@@ -17,9 +17,7 @@ export class UserServerController {
     @Get('/:userId/:serverId')
     @UseGuards(UserServerGuard)
     async getUserServer(@Param('userId') userId: string, @Param('serverId') serverId: string) {
-        const userServer = await this.userServerService.getUserServer(Number(userId), Number(serverId));
-        if (userServer == null) throw new NotFoundException(`UserServer with userId ${userId} and serverId ${serverId} not found`);
-        return userServer;
+        return this.userServerService.getUserServer(Number(userId), Number(serverId));
     }
 
     @Post()
@@ -30,16 +28,12 @@ export class UserServerController {
     @Patch('/:userId/:serverId')
     @UseGuards(UserServerGuard)
     async updateUserServer(@Param('userId') userId: string, @Param('serverId') serverId: string, @Body() userServer: UpdateUserServerDto) {
-        const updatedUserServer = await this.userServerService.updateUserServer(Number(userId), Number(serverId), userServer);
-        if (updatedUserServer == null) throw new NotFoundException(`UserServer with userId ${userId} and serverId ${serverId} not found`);
-        return updatedUserServer;
+        return this.userServerService.updateUserServer(Number(userId), Number(serverId), userServer);
     }
 
     @Delete('/:userId/:serverId')
     @UseGuards(UserServerGuard)
     async deleteUserServer(@Param('userId') userId: String, @Param('serverId') serverId: string) {
-        const deleted = await this.userServerService.deleteUserServer(Number(userId), Number(serverId));
-        if (!deleted) throw new NotFoundException(`UserServer with userId ${userId} and serverId ${serverId} not found`);
-        return { deleted: true };
+        return this.userServerService.deleteUserServer(Number(userId), Number(serverId));
     }
 }

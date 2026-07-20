@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateServerDto } from './dto/create-server.dto';
+import { GetServerDto } from './dto/get-server.dto';
 import { Repository } from 'typeorm';
 import { Server } from './entity/server.entity';
 import { UpdateServerDto } from './dto/update-server.dto';
@@ -9,42 +10,70 @@ export class ServerService {
 
     constructor(@Inject('SERVER_REPOSITORY') private readonly serverRepository: Repository<Server>) {}
 
-    async getAllServers({ limit }: { limit?: number } = {}): Promise<CreateServerDto[]> {
-        return this.serverRepository.find({
+    async getAllServers({ limit }: { limit?: number } = {}): Promise<GetServerDto[]> {
+        const servers = await this.serverRepository.find({
             take: limit,
         });
+        return servers.map(({ server_password, ...server }) => server);
     }
 
-    async getServer({id}:{id?: number} = {}): Promise<CreateServerDto|null> {
+    async getServer({id}:{id?: number} = {}): Promise<GetServerDto|null> {
+        // Find the server by id
         const server = await this.serverRepository.findOneBy({server_id: id});
-        return server;
+
+        // If the server is not found, throw a NotFoundException
+        if (!server) throw new NotFoundException(`Server with id ${id} not found`);
+
+        // Exclude the server_password field from the returned object
+        const {server_password, ...result} = server;
+
+        // Return the server without the server_password field
+        return result;
     }
 
-    async createServer(createServerDto: CreateServerDto): Promise<CreateServerDto> {
+    async createServer(createServerDto: CreateServerDto): Promise<GetServerDto> {
+        // Create a new server entity from the DTO
         const server = this.serverRepository.create(createServerDto);
-        return this.serverRepository.save(server);
+
+        // Save the server entity to the database
+        const savedServer = await this.serverRepository.save(server);
+
+        // Exclude the server_password field from the returned object
+        const {server_password, ...result} = savedServer;
+
+        //  Return the saved server without the server_password field
+        return result;
     }
 
-    async updateServer(id: number, updateServerDto: UpdateServerDto): Promise<CreateServerDto|null> {
+    async updateServer(id: number, updateServerDto: UpdateServerDto): Promise<GetServerDto|null> {
         //find the server by id
         const server = await this.serverRepository.findOneBy({
             server_id: id
         });
 
         // If the server is not found, throw a NotFoundException
-        if (!server) return null;
+        if (!server) throw new NotFoundException(`Server with id ${id} not found`);
 
-        // Update the server properties here if needed
-        // For example, you can update the server name or other properties based on the provided data
-
+        // Update the server entity with the new data from the DTO
         Object.assign(server, updateServerDto);
-        return this.serverRepository.save(server);
+
+        // Save the updated server entity to the database
+        const savedServer = await this.serverRepository.save(server);
+
+        // Exclude the server_password field from the returned object
+        const {server_password, ...result} = savedServer;
+
+        // Return the updated server without the server_password field
+        return result;
     }
 
     async deleteServer({id}: {id?: number} = {}) : Promise<void> {
+        // Delete the server entity from the database by id
         const result = await this.serverRepository.delete({
             server_id: id
         })
+
+        // If no rows were affected, throw a NotFoundException
         if (result.affected === 0) throw new NotFoundException(`Server with id ${id} not found`);
     }
 }
