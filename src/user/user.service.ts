@@ -9,22 +9,22 @@ export class UserService {
 
     constructor(@Inject('USER_REPOSITORY') private userRepository: Repository<User>){}
     
-    async getAllUsers({limit}: {limit?: number} = {}): Promise<User[]>{
+    async getAllUsers({limit}: {limit?: number} = {}): Promise<CreateUserDto[]>{
         return this.userRepository.find({
             take: limit,
         })
     }
 
-    async getUser({id}: {id?: number} = {}): Promise<User|null>{
+    async getUser({id}: {id?: number} = {}): Promise<CreateUserDto|null>{
         return this.userRepository.findOneBy({user_id: id});
     }
 
-    async createUser(createUserDto: CreateUserDto): Promise<User> {
+    async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
         const user = this.userRepository.create(createUserDto)
         return this.userRepository.save(user);
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User|null> {
+    async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<CreateUserDto|null> {
         //find the user by id
         const user = await this.userRepository.findOneBy({
             user_id: id

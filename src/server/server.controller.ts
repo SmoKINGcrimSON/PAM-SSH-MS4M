@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Query, HttpCode, UseGuards, ParseIntPipe, Inject, NotFoundException, Patch } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Query, HttpCode, UseGuards, ParseIntPipe, Inject, NotFoundException, Patch, Delete } from '@nestjs/common';
 import { IdGuard } from '../guards/id.guard';
 import { ServerService } from './server.service';
 import { CreateServerDto } from './dto/create-server.dto';
@@ -33,5 +33,11 @@ export class ServerController {
         const updatedServer = await this.serverService.updateServer(Number(id), server);
         if (updatedServer == null) throw new NotFoundException(`Server with id ${id} not found`);
         return updatedServer;
+    }
+
+    @Delete('/:id')
+    @UseGuards(IdGuard)
+    async deleteServer(@Param('id') id: string) {
+        return this.serverService.deleteServer({id: Number(id)});
     }
 }

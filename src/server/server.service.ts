@@ -9,23 +9,23 @@ export class ServerService {
 
     constructor(@Inject('SERVER_REPOSITORY') private readonly serverRepository: Repository<Server>) {}
 
-    async getAllServers({ limit }: { limit?: number } = {}): Promise<Server[]> {
+    async getAllServers({ limit }: { limit?: number } = {}): Promise<CreateServerDto[]> {
         return this.serverRepository.find({
             take: limit,
         });
     }
 
-    async createServer(createServerDto: CreateServerDto): Promise<Server> {
-        const server = this.serverRepository.create(createServerDto);
-        return this.serverRepository.save(server);
-    }
-
-    async getServer({id}:{id?: number} = {}): Promise<Server|null> {
+    async getServer({id}:{id?: number} = {}): Promise<CreateServerDto|null> {
         const server = await this.serverRepository.findOneBy({server_id: id});
         return server;
     }
 
-    async updateServer(id: number, updateServerDto: UpdateServerDto): Promise<Server|null> {
+    async createServer(createServerDto: CreateServerDto): Promise<CreateServerDto> {
+        const server = this.serverRepository.create(createServerDto);
+        return this.serverRepository.save(server);
+    }
+
+    async updateServer(id: number, updateServerDto: UpdateServerDto): Promise<CreateServerDto|null> {
         //find the server by id
         const server = await this.serverRepository.findOneBy({
             server_id: id
@@ -39,5 +39,12 @@ export class ServerService {
 
         Object.assign(server, updateServerDto);
         return this.serverRepository.save(server);
+    }
+
+    async deleteServer({id}: {id?: number} = {}) : Promise<void> {
+        const result = await this.serverRepository.delete({
+            server_id: id
+        })
+        if (result.affected === 0) throw new NotFoundException(`Server with id ${id} not found`);
     }
 }
