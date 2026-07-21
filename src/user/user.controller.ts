@@ -5,8 +5,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IdGuard } from '../guards/id.guard';
 import { ApiOperation } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/rol.decorator';
 
 @Controller('user')
+@Roles('superuser', 'admin')
 export class UserController {
 
     constructor(private readonly userService: UserService) {}
@@ -25,6 +27,7 @@ export class UserController {
     }
     
     @ApiOperation({ summary: 'Create a new user' })
+    @Roles('superuser') // Only superusers can create new users
     @Post()
     async createUser(@Body() user: CreateUserDto) {
         return this.userService.createUser(user);
@@ -32,7 +35,6 @@ export class UserController {
 
     @ApiOperation({ summary: 'Update a user by ID' })
     @Patch('/:id')
-    @UseGuards(IdGuard)
     async updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
         const updatedUser = await this.userService.updateUser(Number(id), user);
         if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
@@ -40,6 +42,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Delete a user by ID' })
+    @Roles('superuser') // Only superusers can delete users
     @Delete('/:id')
     @UseGuards(IdGuard)
     async deleteUser(@Param('id') id: string) {

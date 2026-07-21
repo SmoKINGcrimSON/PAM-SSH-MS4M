@@ -2,7 +2,6 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthPayloadDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +20,7 @@ export class AuthService {
         //return true if valid, false otherwise
         if (!isPasswordValid) throw new UnauthorizedException('Invalid username or password');
         //generate jwt token
-        const payload = { username: user.username, sub: user.id };
+        const payload = { username: user.username, sub: user.user_id, role: user.user_type };
         return {
             accessToken: await this.jwtService.signAsync(payload),
         };
@@ -33,7 +32,7 @@ export class AuthService {
         const existingUser = await this.userRepository.findOne({ where: { username } });
         if (existingUser) throw new UnauthorizedException('User already exists');
         //hash password and create new user
-         const hashPassword = await bcrypt.hash(password, 10);
+        const hashPassword = await bcrypt.hash(password, 10);
         // Map AuthPayloadDto -> CreateUserDto
         const user = this.userRepository.create({
             username,
@@ -43,7 +42,7 @@ export class AuthService {
 
         await this.userRepository.save(user);
         // Generate access token
-        const payload = { username: user.username, sub: user.id,};
+        const payload = { username: user.username, sub: user.user_id, role: user.user_type };
         return {
             accessToken: await this.jwtService.signAsync(payload),
         };

@@ -4,7 +4,9 @@ import { ServerService } from './server.service';
 import { CreateServerDto } from './dto/create-server.dto';
 import { UpdateServerDto } from './dto/update-server.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/rol.decorator';
 
+@Roles('superuser', 'admin')
 @Controller('server') 
 export class ServerController { 
 
@@ -24,6 +26,7 @@ export class ServerController {
     }
 
     @ApiOperation({ summary: 'Create a new server' })
+    @Roles('superuser')
     @Post()
     async createServer(@Body() server: CreateServerDto) {
         return this.serverService.createServer(server);
@@ -37,6 +40,7 @@ export class ServerController {
     }
 
     @ApiOperation({ summary: 'Delete a server by ID' })
+    @Roles('superuser')
     @Delete('/:id')
     @UseGuards(IdGuard)
     async deleteServer(@Param('id') id: string) {

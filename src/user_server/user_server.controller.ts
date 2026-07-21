@@ -4,8 +4,9 @@ import { CreateUserServerDto } from "./dto/create-user-server.dto";
 import { UserServerService } from "./user_server.service";
 import { UpdateUserServerDto } from "./dto/update-user-server.dto";
 import { ApiOperation } from "@nestjs/swagger";
+import { Roles } from "src/common/decorators/rol.decorator";
 
-
+@Roles('superuser', 'admin')
 @Controller('user-server')
 export class UserServerController {
     constructor(private readonly userServerService: UserServerService) {}
@@ -25,6 +26,7 @@ export class UserServerController {
     }
 
     @ApiOperation({ summary: 'Create a new user-server relationship' })
+    @Roles('superuser')
     @Post()
     async createUserServer(@Body() userServer: CreateUserServerDto) {
         return this.userServerService.createUserServer(userServer);
@@ -38,6 +40,7 @@ export class UserServerController {
     }
 
     @ApiOperation({ summary: 'Delete a user-server relationship by user ID and server ID' })
+    @Roles('superuser')
     @Delete('/:userId/:serverId')
     @UseGuards(UserServerGuard)
     async deleteUserServer(@Param('userId') userId: String, @Param('serverId') serverId: string) {

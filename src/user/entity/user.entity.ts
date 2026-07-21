@@ -12,7 +12,7 @@ export class User {
     user_type!: string;
 
     @Column()
-    hash_password!: string;
+    hash_password!: string; //superuser, admin, user
 
     constructor(user: Partial<User>){
         Object.assign(this, user)
