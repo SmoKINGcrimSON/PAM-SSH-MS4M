@@ -23,7 +23,7 @@ export class UserController {
     async getUser(@Param('id') id: string){
         return this.userService.getUser({id: Number(id)});
     }
-
+    
     @ApiOperation({ summary: 'Create a new user' })
     @Post()
     async createUser(@Body() user: CreateUserDto) {

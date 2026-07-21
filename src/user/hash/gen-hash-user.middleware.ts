@@ -11,7 +11,6 @@ export class GenHashUserMiddleware implements NestMiddleware {
       const hashedPassword = bcrypt.hashSync(req.body.hash_password, saltRounds);
       req.body.hash_password = hashedPassword; // Replace the original password with the hashed version
     }
-    console.log(req.body); // Log the modified request body
     next();
   }
 }

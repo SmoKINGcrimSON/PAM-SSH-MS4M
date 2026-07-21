@@ -22,7 +22,8 @@ import { AuthGuard } from './guards/auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, ...userProviders,  { provide: APP_GUARD, useClass: AuthGuard,}],
+  providers: [AuthService, ...userProviders,  { provide: APP_GUARD, useClass: AuthGuard,}], 
+  /*APP_GUARD MAKES ENDPOINTS WRAPPED BY AUTHGUARD*/
   exports: [AuthService]
 })
 export class AuthModule {}

@@ -1,5 +1,6 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Get, Request } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Request } from '@nestjs/common';
 import { AuthPayloadDto } from './dto/auth.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { Public } from 'src/common/decorators/public.decorator';
 
@@ -15,7 +16,13 @@ export class AuthController {
         return this.authService.validateUser(authPayload);
     }
 
-    //@UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.CREATED)
+    @Public()
+    @Post('register')
+    async register(@Body() authPayload: AuthPayloadDto): Promise<{ accessToken: string }> {
+        return this.authService.registerUser(authPayload);
+    }
+
     @Get('profile')
     getProfile(@Request() req) {
         return req.user;
