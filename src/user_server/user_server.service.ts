@@ -13,7 +13,8 @@ export class UserServerService {
         });
 
         // Exclude the encrypted_password field from the returned objects
-        return userServers.map(({ encrypted_password, ...userServer }) => userServer);
+        //return userServers.map(({ encrypted_password, ...userServer }) => userServer);
+        return userServers;
     }
 
     async getUserServer(userId: number, serverId: number): Promise<GetUserServerDto|null> {
@@ -37,7 +38,7 @@ export class UserServerService {
         if (!userServer) throw new NotFoundException(`UserServer with userId ${userId} and serverId ${serverId} not found`);
 
         // Exclude the encrypted_password field from the returned object and also exclude server_password from the server object 
-        const { user_server_id, encrypted_password, server, user, ...result } = userServer;
+        const { user_server_id, server, user, ...result } = userServer; //encrypted_password dont quit 
         const {server_password, server_id, ...serverWithoutPassword} = server;
         const {user_id, ...userWithoutId} = user;
 
@@ -91,10 +92,11 @@ export class UserServerService {
         const saved = await this.userServerRepository.save(existingUserServer);
 
         // Exclude the encrypted_password field from the returned object
-        const { encrypted_password, ...userServerWithoutPassword } = saved;
+        //const { encrypted_password, ...userServerWithoutPassword } = saved;
 
         // Return the updated user-server association without the encrypted_password field
-        return userServerWithoutPassword;
+        //return userServerWithoutPassword;
+        return saved;
     }
 
     async deleteUserServer(userId: number, serverId: number): Promise<void>{

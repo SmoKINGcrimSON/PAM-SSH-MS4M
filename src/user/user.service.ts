@@ -20,6 +20,13 @@ export class UserService {
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+        // Check if a user with the same username already exists
+        const existingUser = await this.userRepository.findOneBy({ username: createUserDto.username });
+
+        // If a user with the same username exists, throw a NotFoundException
+        if (existingUser) throw new NotFoundException(`User with username ${createUserDto.username} already exists.`);
+
+        // Create a new user entity and save it to the database
         const user = this.userRepository.create(createUserDto)
         return this.userRepository.save(user);
     }
@@ -33,10 +40,13 @@ export class UserService {
         // If the user is not found, throw a NotFoundException
         if (!user) return null;
 
+        // Destructure the updateUserDto to drop the username from the rest of the properties
+        const {username, ...updateData} = updateUserDto as any;
+
         // Update the user properties here if needed
         // For example, you can update the username or user_type based on the provided data
 
-        Object.assign(user, updateUserDto);
+        Object.assign(user, updateData);
         return this.userRepository.save(user);
     }
 
