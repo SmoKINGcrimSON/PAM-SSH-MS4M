@@ -20,6 +20,7 @@ export class UserServerController {
     @Get('/:userId/:serverId')
     @UseGuards(UserServerGuard)
     async getUserServer(@Param('userId') userId: string, @Param('serverId') serverId: string) {
+        console.log(`Fetching user-server relationship for userId: ${userId}, serverId: ${serverId}`);
         return this.userServerService.getUserServer(Number(userId), Number(serverId));
     }
 

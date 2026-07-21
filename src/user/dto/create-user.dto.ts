@@ -9,4 +9,8 @@ export class CreateUserDto {
     @IsString()
     @MinLength(1)
     user_type!: string;
+
+    @IsString()
+    @MinLength(1)
+    hash_password!: string;
 }

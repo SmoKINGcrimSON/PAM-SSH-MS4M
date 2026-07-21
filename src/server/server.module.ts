@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { ServerController } from './server.controller';
 import { ServerService } from './server.service';
 import { DatabaseModule } from 'src/database/database.module';
@@ -9,4 +9,4 @@ import { serverProviders } from './entity/server.provider';
     controllers: [ServerController],
     providers: [ServerService, ...serverProviders],
 })
-export class ServerModule { }
+export class ServerModule {}
