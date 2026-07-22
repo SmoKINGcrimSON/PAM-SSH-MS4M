@@ -11,9 +11,10 @@ import { Roles } from 'src/common/decorators/rol.decorator';
 export class ServerController { 
 
     constructor(private readonly serverService: ServerService){} //private rreadonly
-   
+
     @Get()
     @ApiOperation({ summary: 'Get all servers with optional limit' })
+    @Roles('superuser')
     async getAllServers(@Query('limit') limit?: string) {
         return this.serverService.getAllServers({ limit: limit !== undefined ? Number(limit) : undefined });
     }
@@ -25,23 +26,23 @@ export class ServerController {
         return this.serverService.getServer({id: Number(id)});
     }
 
+    @Post()
     @ApiOperation({ summary: 'Create a new server' })
     @Roles('superuser')
-    @Post()
     async createServer(@Body() server: CreateServerDto) {
         return this.serverService.createServer(server);
     }
 
-    @ApiOperation({ summary: 'Update a server by ID' })
     @Patch('/:id')
+    @ApiOperation({ summary: 'Update a server by ID' })
     @UseGuards(IdGuard)
     async updateServer(@Param('id') id: string, @Body() server: UpdateServerDto) {
         return this.serverService.updateServer(Number(id), server);
     }
 
+    @Delete('/:id')
     @ApiOperation({ summary: 'Delete a server by ID' })
     @Roles('superuser')
-    @Delete('/:id')
     @UseGuards(IdGuard)
     async deleteServer(@Param('id') id: string) {
         return this.serverService.deleteServer({id: Number(id)});

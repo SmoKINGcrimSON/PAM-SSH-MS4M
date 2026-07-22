@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { userProviders } from './entity/user.provider';
-import { GenHashUserMiddleware } from './hash/gen-hash-user.middleware';
+import { GenHashUserMiddleware } from '../middlewares/gen-hash-user.middleware';
 
 @Module({
     imports: [DatabaseModule],
@@ -13,8 +13,9 @@ import { GenHashUserMiddleware } from './hash/gen-hash-user.middleware';
 
 export class UserModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-    consumer.apply(GenHashUserMiddleware).forRoutes({
-        path: '/user', method: RequestMethod.POST // 0 corresponds to RequestMethod.ALL
-    });
+    consumer.apply(GenHashUserMiddleware).forRoutes(
+        { path: '/user', method: RequestMethod.POST },
+        { path: '/user/:id', method: RequestMethod.PATCH },
+    );
   }
 }

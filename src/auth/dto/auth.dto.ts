@@ -8,5 +8,5 @@ export class AuthPayloadDto{
 
     @IsString()
     @MinLength(1)
-    password!: string;
+    hash_password!: string;
 }

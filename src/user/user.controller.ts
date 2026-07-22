@@ -36,9 +36,7 @@ export class UserController {
     @ApiOperation({ summary: 'Update a user by ID' })
     @Patch('/:id')
     async updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
-        const updatedUser = await this.userService.updateUser(Number(id), user);
-        if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
-        return updatedUser;
+        return await this.userService.updateUser(Number(id), user);
     }
 
     @ApiOperation({ summary: 'Delete a user by ID' })

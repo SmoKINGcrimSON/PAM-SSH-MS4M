@@ -22,7 +22,7 @@ export class ServerService {
         const server = await this.serverRepository.findOneBy({server_id: id});
 
         // If the server is not found, throw a NotFoundException
-        if (!server) throw new NotFoundException(`Server with id ${id} not found`);
+        if (!server) throw new NotFoundException(`Server not found`);
 
         // Exclude the server_password field from the returned object
         const {server_password, ...result} = server;
@@ -32,6 +32,12 @@ export class ServerService {
     }
 
     async createServer(createServerDto: CreateServerDto): Promise<GetServerDto> {
+        const existingServer = await this.serverRepository.findOneBy({
+            ip_address: createServerDto.ip_address,
+            ssh_port: createServerDto.ssh_port,
+            mine_name: createServerDto.mine_name,
+        })
+        if (existingServer) throw new NotFoundException(`Server with hostname ${createServerDto.hostname}, ip_address ${createServerDto.ip_address} and mine_name ${createServerDto.mine_name} already exists`);
         // Create a new server entity from the DTO
         const server = this.serverRepository.create(createServerDto);
 
@@ -52,7 +58,7 @@ export class ServerService {
         });
 
         // If the server is not found, throw a NotFoundException
-        if (!server) throw new NotFoundException(`Server with id ${id} not found`);
+        if (!server) throw new NotFoundException(`Server not found`);
 
         // Update the server entity with the new data from the DTO
         Object.assign(server, updateServerDto);
@@ -74,6 +80,6 @@ export class ServerService {
         })
 
         // If no rows were affected, throw a NotFoundException
-        if (result.affected === 0) throw new NotFoundException(`Server with id ${id} not found`);
+        if (result.affected === 0) throw new NotFoundException(`Server not found`);
     }
 }

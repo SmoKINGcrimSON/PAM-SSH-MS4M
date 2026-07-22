@@ -10,13 +10,13 @@ export class UserService {
     constructor(@Inject('USER_REPOSITORY') private userRepository: Repository<User>){}
     
     async getAllUsers({limit}: {limit?: number} = {}): Promise<CreateUserDto[]>{
-        return this.userRepository.find({
-            take: limit,
-        })
+        return this.userRepository.find({take: limit, order: {username: 'ASC'}});
     }
 
     async getUser({id}: {id?: number} = {}): Promise<CreateUserDto|null>{
-        return this.userRepository.findOneBy({user_id: id});
+        const user = await this.userRepository.findOneBy({user_id: id});
+        if (!user) throw new NotFoundException(`User not found.`);
+        return user;
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
@@ -38,7 +38,7 @@ export class UserService {
         });
 
         // If the user is not found, throw a NotFoundException
-        if (!user) return null;
+        if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
         // Destructure the updateUserDto to drop the username from the rest of the properties
         const {username, ...updateData} = updateUserDto as any;
@@ -51,10 +51,8 @@ export class UserService {
     }
 
     async deleteUser({id}: {id?: number} = {}) : Promise<void> {
-        const result = await this.userRepository.delete({
-            user_id: id
-        })
+        const result = await this.userRepository.delete({user_id: id});
 
-        if (result.affected === 0) throw new NotFoundException()
+        if (result.affected === 0) throw new NotFoundException("User to delete does not exist");
     }
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
@@ -8,6 +8,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { GenHashUserMiddleware } from 'src/middlewares/gen-hash-user.middleware';
 
 @Module({
   imports: [
@@ -27,4 +28,10 @@ import { RolesGuard } from './guards/roles.guard';
   /*APP_GUARD MAKES ENDPOINTS WRAPPED BY AUTHGUARD*/
   exports: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply the AuthGuard to all routes in this module
+    consumer
+      .apply(GenHashUserMiddleware).forRoutes({ path: '/auth/register', method: RequestMethod.POST });
+  }
+}
