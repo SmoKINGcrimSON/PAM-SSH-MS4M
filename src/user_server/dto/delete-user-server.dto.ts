@@ -11,5 +11,5 @@ export class DeleteUserServerDto {
 
     @IsNumber()
     @Min(1)
-    server_id!: string;
+    server_id!: number;
 }

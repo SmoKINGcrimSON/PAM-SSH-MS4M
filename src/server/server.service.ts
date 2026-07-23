@@ -54,7 +54,10 @@ export class ServerService {
     async updateServer(id: number, updateServerDto: UpdateServerDto): Promise<GetServerDto|null> {
         //find the server by id
         const server = await this.serverRepository.findOneBy({
-            server_id: id
+            server_id: id,
+            ip_address: updateServerDto.ip_address,
+            ssh_port: updateServerDto.ssh_port,
+            mine_name: updateServerDto.mine_name,
         });
 
         // If the server is not found, throw a NotFoundException
