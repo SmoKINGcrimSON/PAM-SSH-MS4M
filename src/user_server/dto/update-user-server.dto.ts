@@ -1,18 +1,4 @@
-//import { PartialType } from "@nestjs/mapped-types";
-//import { CreateUserServerDto } from "./create-user-server.dto";
+import { PartialType } from '@nestjs/swagger';
+import { CreateUserServerDto } from "./create-user-server.dto";
 
-import { Min, MinLength, IsNumber, IsString } from "class-validator";
-
-export class UpdateUserServerDto{ //extends PartialType(CreateUserServerDto) {}
-    @IsString()
-        @MinLength(1)
-        ssh_username!: string;
-    
-        @IsNumber()
-        @Min(1)
-        user_id!: number;
-    
-        @IsNumber()
-        @Min(1)
-        server_id!: number;
-}
+export class UpdateUserServerDto extends PartialType(CreateUserServerDto) {} //extends OmitType(CreateUserServerDto, ['encrypted_password'] as const) {}    

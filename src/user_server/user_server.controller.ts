@@ -5,7 +5,6 @@ import { UserServerService } from "./user_server.service";
 import { UpdateUserServerDto } from "./dto/update-user-server.dto";
 import { ApiOperation } from "@nestjs/swagger";
 import { Roles } from "src/common/decorators/rol.decorator";
-import { GetMyUsersInServerDto } from "./dto/get-my-users-in-server.dto";
 
 @Roles('superuser', 'admin')
 @Controller('user-server')
@@ -17,12 +16,6 @@ export class UserServerController {
     @Get()
     async getAllUserServers(@Query('limit') limit?: string) {
         return this.userServerService.getAllUserServers({limit: limit !== undefined ? Number(limit) : undefined});
-    }
-
-    @ApiOperation({ summary: 'Get a user-server relationship by user ID and server ID' })
-    @Get('my-users-in-server')
-    async getMyUsersInOneServer(@Body() getMyUsersInServer: GetMyUsersInServerDto) { //@Param('userId') userId: string, @Param('serverId') serverId: string
-        return this.userServerService.getMyUsersInOneServer(getMyUsersInServer);
     }
 
     @ApiOperation({ summary: 'Create a new user-server relationship' })

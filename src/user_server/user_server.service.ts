@@ -2,7 +2,6 @@ import { Injectable, Inject, NotFoundException } from "@nestjs/common";
 import { CreateUserServerDto } from "./dto/create-user-server.dto";
 import { GetUserServerDto } from "./dto/get-user-server.dto";
 import { DeleteUserServerDto } from "./dto/delete-user-server.dto";
-import { GetMyUsersInServerDto } from "./dto/get-my-users-in-server.dto";
 import { UpdateUserServerDto } from "./dto/update-user-server.dto";
 
 @Injectable()
@@ -19,39 +18,7 @@ export class UserServerService {
             take: limit,
         });
 
-        // Exclude the encrypted_password field from the returned objects
-        //return userServers.map(({ encrypted_password, ...userServer }) => userServer);
         return userServers;
-    }
-
-    async getMyUsersInOneServer(getMyUsersInServerDto: GetMyUsersInServerDto): Promise<GetUserServerDto[]|null> { //userId: number, serverId: number
-        // Fetch a specific user-server association from the database based on the provided userId and serverId
-        const userServer = await this.userServerRepository.find({
-            where:{
-                user :{ 
-                    user_id: getMyUsersInServerDto.user_id, 
-                },
-                server :{ 
-                    server_id: getMyUsersInServerDto.server_id, 
-                },
-            },
-            /*
-            relations: {
-                user: true,
-                server: true,
-            }*/
-        });
-
-        // If the user-server association is not found, throw a NotFoundException
-        if (!userServer || userServer.length === 0) throw new NotFoundException(`UserServer with userId ${getMyUsersInServerDto.user_id} and serverId ${getMyUsersInServerDto.server_id} not found`);
-        return userServer;
-        // Exclude the encrypted_password field from the returned object and also exclude server_password from the server object 
-        //const { user_server_id, server, user, ...result } = userServer; //encrypted_password dont quit 
-        //const {server_password, server_id, ...serverWithoutPassword} = server;
-        //const {user_id, ...userWithoutId} = user;
-
-        // Return the user-server association without the encrypted_password field, and also return the server object without
-        //return { ...result, server: serverWithoutPassword, user: userWithoutId };
     }
 
     async createUserServer(userServer: CreateUserServerDto) : Promise<GetUserServerDto> {
@@ -97,57 +64,47 @@ export class UserServerService {
         // Save the new user-server association entity to the database
         const savedEntity = await this.userServerRepository.save(entity);
 
-        // Exclude the encrypted_password field from the returned object
-        //const { encrypted_password, ...userServerWithoutPassword } = savedEntity;
-
-        // Return the saved user-server association without the encrypted_password field
-        /*return {
-            ssh_username: savedEntity.ssh_username,
-            password: savedEntity.encrypted_password,
-        };*/
         return savedEntity;
     }
 
     async updateUserServer(userServer: UpdateUserServerDto): Promise<GetUserServerDto|null> { //ssh_username: string, 
         // Find the existing user-server association by ssh_username
-        const existingUserServer = await this.userServerRepository.findOne({
-            where: {
-                user:{
-                    user_id: userServer.user_id,
+        try{
+            const existingUserServer = await this.userServerRepository.findOne({
+                where: {
+                    user:{
+                        user_id: userServer.user_id,
+                    },
+                    server:{
+                        server_id: userServer.server_id,
+                    },
+                    ssh_username: userServer.ssh_username,
                 },
-                server:{
-                    server_id: userServer.server_id,
+                relations: {
+                    user: true,
+                    server: true,
                 },
-                ssh_username: userServer.ssh_username,
-            },
-            /*
-            relations: {
-                user: true,
-                server: true,
-            },*/
-        });
+            });
 
-        // If the existing user-server association is not found, throw a NotFoundException
-        if (!existingUserServer) throw new NotFoundException(`UserServer with this ssh_username ${userServer.ssh_username} doesn't exist`);
-        const {ssh_username, user_id, server_id, ...userServerWithoutUsername} = userServer;
+            console.log('existingUserServer in service:', existingUserServer);
 
-        // Update the existing user-server association with the new data from the DTO
-        Object.assign(existingUserServer, userServerWithoutUsername);
+            // If the existing user-server association is not found, throw a NotFoundException
+            if (!existingUserServer) throw new NotFoundException(`UserServer with this ssh_username ${userServer.ssh_username} doesn't exist`);
+            const {ssh_username, user_id, server_id, ...userServerWithoutUsername} = userServer;
 
-        // Save the updated user-server association entity to the database
-        const saved = await this.userServerRepository.save(existingUserServer);
+            // Update the existing user-server association with the new data from the DTO
+            Object.assign(existingUserServer, userServerWithoutUsername);
 
-        // Exclude the encrypted_password field from the returned object
-        //const { encrypted_password, ...userServerWithoutPassword } = saved;
+            // Save the updated user-server association entity to the database
+            const saved = await this.userServerRepository.save(existingUserServer);
 
-        // Return the updated user-server association without the encrypted_password field
-        //return userServerWithoutPassword;
-        //const {user_server_id, ...userServerWithoutId} = saved;
-        //return userServerWithoutId;
-        return {
-            ssh_username: saved.ssh_username,
-            server_id: saved.server.server_id,
-        };
+            return {
+                ssh_username: saved.ssh_username,
+                encrypted_password: saved.encrypted_password,
+            };
+        } catch (error) {
+            throw new NotFoundException(`Error in data provided: ${error}`);
+        }
     }
 
     async deleteUserServer(deleteUserDto: DeleteUserServerDto): Promise<void>{
